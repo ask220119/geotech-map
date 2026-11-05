@@ -1,0 +1,405 @@
+{
+ "type": "FeatureCollection",
+ "features": [
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     11.2407,
+     28.3484
+    ]
+   },
+   "properties": {
+    "labelId": "c0",
+    "ownerId": 0,
+    "name_en": "Consolidation & Secondary compression",
+    "name_fr": "Consolidation et Fluage",
+    "symbolzoom": 2,
+    "keywords": [
+     "consolidation",
+     "secondary compression",
+     "creep",
+     "settlement",
+     "soft clay"
+    ],
+    "size": 278
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     47.6347,
+     42.0353
+    ]
+   },
+   "properties": {
+    "labelId": "c1",
+    "ownerId": 1,
+    "name_en": "Liquefaction & Site response",
+    "name_fr": "Liquéfaction et Réponse de site",
+    "symbolzoom": 2,
+    "keywords": [
+     "liquefaction",
+     "site response",
+     "cyclic loading",
+     "shear wave velocity",
+     "soil liquefaction"
+    ],
+    "size": 273
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     105.3658,
+     3.5455
+    ]
+   },
+   "properties": {
+    "labelId": "c2",
+    "ownerId": 2,
+    "name_en": "Deep excavations & Monitoring",
+    "name_fr": "Excavations profondes et Auscultation",
+    "symbolzoom": 2,
+    "keywords": [
+     "deep excavations",
+     "monitoring",
+     "earth pressure",
+     "retaining walls",
+     "diaphragm wall"
+    ],
+    "size": 266
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     68.8083,
+     4.345
+    ]
+   },
+   "properties": {
+    "labelId": "c3",
+    "ownerId": 3,
+    "name_en": "Pile foundations & Piled raft",
+    "name_fr": "Fondations sur pieux et Radier sur pieux",
+    "symbolzoom": 2,
+    "keywords": [
+     "pile foundations",
+     "piled raft",
+     "bearing capacity",
+     "laterally loaded piles",
+     "pile groups"
+    ],
+    "size": 257
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     -77.6657,
+     0.4797
+    ]
+   },
+   "properties": {
+    "labelId": "c4",
+    "ownerId": 4,
+    "name_en": "Slope stability & Reliability analysis",
+    "name_fr": "Stabilité des pentes et Analyse de fiabilité",
+    "symbolzoom": 2,
+    "keywords": [
+     "slope stability",
+     "reliability analysis",
+     "spatial variability",
+     "random field",
+     "limit equilibrium"
+    ],
+    "size": 255
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     -44.8711,
+     -15.3239
+    ]
+   },
+   "properties": {
+    "labelId": "c5",
+    "ownerId": 5,
+    "name_en": "Unsaturated soils & Soil water retention curve",
+    "name_fr": "Sols non saturés et Courbe de rétention d'eau",
+    "symbolzoom": 2,
+    "keywords": [
+     "unsaturated soils",
+     "soil water retention curve",
+     "swelling",
+     "hydraulic conductivity",
+     "matric suction"
+    ],
+    "size": 252
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     29.2543,
+     -3.9178
+    ]
+   },
+   "properties": {
+    "labelId": "c6",
+    "ownerId": 6,
+    "name_en": "Constitutive modelling & Hypoplasticity",
+    "name_fr": "Modélisation constitutive et Hypoplasticité",
+    "symbolzoom": 2,
+    "keywords": [
+     "constitutive modelling",
+     "hypoplasticity",
+     "anisotropy",
+     "small strain",
+     "critical state"
+    ],
+    "size": 250
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     42.1921,
+     -40.9088
+    ]
+   },
+   "properties": {
+    "labelId": "c7",
+    "ownerId": 7,
+    "name_en": "Discrete element method & Particle breakage",
+    "name_fr": "Méthode des éléments discrets et Rupture des grains",
+    "symbolzoom": 2,
+    "keywords": [
+     "discrete element method",
+     "particle breakage",
+     "triaxial test",
+     "dem",
+     "granular materials"
+    ],
+    "size": 247
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     86.7781,
+     39.5562
+    ]
+   },
+   "properties": {
+    "labelId": "c8",
+    "ownerId": 8,
+    "name_en": "Offshore & Scour",
+    "name_fr": "Offshore et Affouillement",
+    "symbolzoom": 3,
+    "keywords": [
+     "offshore",
+     "scour",
+     "suction caisson",
+     "marine clay",
+     "monopile"
+    ],
+    "size": 246
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     2.417,
+     -44.4907
+    ]
+   },
+   "properties": {
+    "labelId": "c9",
+    "ownerId": 9,
+    "name_en": "Geosynthetics & Pavement",
+    "name_fr": "Géosynthétiques et Chaussée",
+    "symbolzoom": 3,
+    "keywords": [
+     "geosynthetics",
+     "pavement",
+     "reinforced soil",
+     "embankments",
+     "geogrid"
+    ],
+    "size": 246
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     78.4252,
+     -31.3472
+    ]
+   },
+   "properties": {
+    "labelId": "c10",
+    "ownerId": 10,
+    "name_en": "Rock mechanics & Acoustic emission",
+    "name_fr": "Mécanique des roches et Émission acoustique",
+    "symbolzoom": 3,
+    "keywords": [
+     "rock mechanics",
+     "acoustic emission",
+     "rockburst",
+     "fractures",
+     "rock mass classification"
+    ],
+    "size": 245
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     -26.3282,
+     21.5415
+    ]
+   },
+   "properties": {
+    "labelId": "c11",
+    "ownerId": 11,
+    "name_en": "Biocementation & Soil stabilization",
+    "name_fr": "Biocimentation et Stabilisation des sols",
+    "symbolzoom": 3,
+    "keywords": [
+     "biocementation",
+     "soil stabilization",
+     "cement",
+     "lime",
+     "micp"
+    ],
+    "size": 243
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     -61.8829,
+     36.1816
+    ]
+   },
+   "properties": {
+    "labelId": "c12",
+    "ownerId": 12,
+    "name_en": "Frozen soil & Energy piles",
+    "name_fr": "Sol gelé et Géostructures énergétiques",
+    "symbolzoom": 3,
+    "keywords": [
+     "frozen soil",
+     "energy piles",
+     "thermal",
+     "freeze-thaw",
+     "permafrost"
+    ],
+    "size": 239
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     115.0894,
+     -33.8028
+    ]
+   },
+   "properties": {
+    "labelId": "c13",
+    "ownerId": 13,
+    "name_en": "Tunnelling & Face stability",
+    "name_fr": "Tunnels et Stabilité du front de taille",
+    "symbolzoom": 3,
+    "keywords": [
+     "tunnelling",
+     "face stability",
+     "tbm",
+     "settlement",
+     "shield tunnelling"
+    ],
+    "size": 238
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     -116.0787,
+     1.074
+    ]
+   },
+   "properties": {
+    "labelId": "c14",
+    "ownerId": 14,
+    "name_en": "Landslides & Debris flow",
+    "name_fr": "Glissements de terrain et Lave torrentielle",
+    "symbolzoom": 3,
+    "keywords": [
+     "landslides",
+     "debris flow",
+     "rainfall",
+     "insar",
+     "landslide susceptibility"
+    ],
+    "size": 236
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     -6.4846,
+     -10.364
+    ]
+   },
+   "properties": {
+    "labelId": "c15",
+    "ownerId": 15,
+    "name_en": "Ground improvement & Stone columns",
+    "name_fr": "Amélioration des sols et Colonnes ballastées",
+    "symbolzoom": 3,
+    "keywords": [
+     "ground improvement",
+     "stone columns",
+     "vacuum preloading",
+     "jet grouting",
+     "prefabricated vertical drains"
+    ],
+    "size": 229
+   }
+  }
+ ]
+}

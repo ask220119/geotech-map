@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Map of Geotechnics</title>
+  <meta name="description" content="A map of geotechnical research. Each dot is a paper; papers that cite the same literature sit close together and form countries.">
+  <link rel="stylesheet" href="vendor/maplibre-gl.css">
+  <link rel="stylesheet" href="css/main.css">
+</head>
+<body>
+  <div id="map"></div>
+
+  <form class="search-box" autocomplete="off" onsubmit="return false">
+    <button type="button" class="icon-btn" id="about-btn" aria-label="About">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+    </button>
+    <input id="search" type="text" spellcheck="false" data-i18n-placeholder="search_placeholder">
+    <button type="button" class="icon-btn" id="clear-btn" hidden aria-label="Clear">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+    <ul id="suggestions" class="suggestions" hidden></ul>
+  </form>
+
+  <div class="lang-switch" role="group" aria-label="Language">
+    <button type="button" data-lang="en">EN</button>
+    <button type="button" data-lang="fr">FR</button>
+  </div>
+
+  <aside id="paper-panel" class="panel left" hidden></aside>
+  <aside id="country-panel" class="panel right" hidden></aside>
+  <aside id="about-panel" class="panel left about" hidden></aside>
+
+  <div id="tooltip" class="tooltip" hidden></div>
+  <div class="made-by" id="made-by"></div>
+
+  <script src="vendor/maplibre-gl.js"></script>
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,24 @@
+{
+ "papers": 4000,
+ "countries": 16,
+ "links": 34341,
+ "built": "2026-11-05",
+ "source": "OpenAlex",
+ "topics": [
+  "Geotechnical Engineering and Soil Mechanics",
+  "Geotechnical Engineering and Soil Stabilization",
+  "Geotechnical Engineering and Underground Structures",
+  "Tunneling and Rock Mechanics",
+  "Rock Mechanics and Modeling",
+  "Grouting, Rheology, and Soil Mechanics",
+  "Soil and Unsaturated Flow",
+  "Soil, Finite Element Methods",
+  "Landslides and related hazards",
+  "Dam Engineering and Safety",
+  "Geotechnical Engineering and Analysis",
+  "Geotechnical and Geomechanical Engineering",
+  "Geomechanics and Mining Engineering",
+  "Geotechnical and Mining Engineering"
+ ],
+ "min_citations": 50
+}
