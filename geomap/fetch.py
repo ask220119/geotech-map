@@ -50,7 +50,7 @@ def run(cfg: dict | None = None):
         "primary_topic.id:" + "|".join(oa["topics"].keys()),
         f"cited_by_count:>{int(oa['min_citations']) - 1}",
         f"publication_year:>{int(oa['from_year']) - 1}",
-        "type:article|review|book-chapter|proceedings-article",
+        "type:article|review|book-chapter|conference-paper",
     ])
     params = {"filter": filt, "select": FIELDS, "per-page": 200, "cursor": "*",
               "sort": "cited_by_count:desc"}
