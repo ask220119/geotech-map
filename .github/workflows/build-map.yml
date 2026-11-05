@@ -34,6 +34,7 @@ jobs:
       - name: Build the map
         env:
           OPENALEX_MAILTO: ${{ vars.OPENALEX_MAILTO }}
+          OPENALEX_API_KEY: ${{ secrets.OPENALEX_API_KEY }}
         run: python run.py ${{ github.event.inputs.mode || 'all' }}
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
