@@ -56,7 +56,10 @@ def run(cfg: dict | None = None):
               "sort": "cited_by_count:desc"}
     if mailto:
         params["mailto"] = mailto
-
+    api_key = os.environ.get("OPENALEX_API_KEY")
+    if api_key:
+        params["api_key"] = api_key
+        
     session = requests.Session()
     rows, total = [], None
     while params["cursor"] and len(rows) < oa["max_works"]:
