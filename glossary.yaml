@@ -1,0 +1,237 @@
+# EN -> FR geotechnical glossary used to translate country names (method: keywords)
+# and the interface. Keys are lower-case. Extend freely; longest match wins.
+terms:
+  geotechnical engineering: géotechnique
+  geotechnics: géotechnique
+  soil mechanics: mécanique des sols
+  rock mechanics: mécanique des roches
+  rock mass: massif rocheux
+  rock mass classification: classification des massifs rocheux
+  rock slope: talus rocheux
+  rock burst: coup de terrain
+  rockburst: coup de terrain
+  rockfall: chute de blocs
+  shear strength: résistance au cisaillement
+  undrained shear strength: cohésion non drainée
+  effective stress: contrainte effective
+  pore water pressure: pression interstitielle
+  pore pressure: pression interstitielle
+  consolidation: consolidation
+  secondary compression: fluage
+  creep: fluage
+  settlement: tassement
+  settlements: tassements
+  bearing capacity: capacité portante
+  shallow foundation: fondation superficielle
+  shallow foundations: fondations superficielles
+  foundation: fondation
+  foundations: fondations
+  pile: pieu
+  piles: pieux
+  pile foundation: fondation sur pieux
+  pile foundations: fondations sur pieux
+  pile group: groupe de pieux
+  pile groups: groupes de pieux
+  piled raft: radier sur pieux
+  driven piles: pieux battus
+  bored piles: pieux forés
+  laterally loaded piles: pieux sous charge latérale
+  soil-structure interaction: interaction sol-structure
+  retaining wall: mur de soutènement
+  retaining walls: murs de soutènement
+  retaining structures: ouvrages de soutènement
+  diaphragm wall: paroi moulée
+  sheet pile: palplanche
+  anchors: tirants d'ancrage
+  ground anchors: tirants d'ancrage
+  soil nailing: clouage des sols
+  deep excavation: excavation profonde
+  deep excavations: excavations profondes
+  excavation: excavation
+  earth pressure: poussée des terres
+  lateral earth pressure: poussée latérale des terres
+  slope stability: stabilité des pentes
+  slope: pente
+  slopes: pentes
+  landslide: glissement de terrain
+  landslides: glissements de terrain
+  landslide susceptibility: susceptibilité aux glissements
+  debris flow: lave torrentielle
+  debris flows: laves torrentielles
+  limit equilibrium: équilibre limite
+  limit analysis: analyse limite
+  reliability analysis: analyse de fiabilité
+  reliability: fiabilité
+  probabilistic analysis: analyse probabiliste
+  spatial variability: variabilité spatiale
+  random field: champ aléatoire
+  liquefaction: liquéfaction
+  soil liquefaction: liquéfaction des sols
+  cyclic loading: chargement cyclique
+  seismic: sismique
+  earthquake: séisme
+  site response: réponse de site
+  dynamic properties: propriétés dynamiques
+  shear wave velocity: vitesse des ondes de cisaillement
+  vibration: vibrations
+  unsaturated soil: sol non saturé
+  unsaturated soils: sols non saturés
+  suction: succion
+  matric suction: succion matricielle
+  soil water retention curve: courbe de rétention d'eau
+  soil-water characteristic curve: courbe de rétention d'eau
+  hydraulic conductivity: conductivité hydraulique
+  permeability: perméabilité
+  seepage: infiltration
+  groundwater: eaux souterraines
+  dewatering: rabattement de nappe
+  expansive soil: sol gonflant
+  expansive soils: sols gonflants
+  swelling: gonflement
+  collapsible soil: sol effondrable
+  clay: argile
+  clays: argiles
+  soft clay: argile molle
+  sand: sable
+  sands: sables
+  loess: lœss
+  peat: tourbe
+  residual soil: sol résiduel
+  ground improvement: amélioration des sols
+  soil improvement: amélioration des sols
+  soil stabilization: stabilisation des sols
+  stabilization: stabilisation
+  lime: chaux
+  cement: ciment
+  stone columns: colonnes ballastées
+  vertical drains: drains verticaux
+  prefabricated vertical drains: drains verticaux préfabriqués
+  preloading: préchargement
+  vacuum preloading: préchargement sous vide
+  jet grouting: jet grouting
+  grouting: injection
+  compaction: compactage
+  dynamic compaction: compactage dynamique
+  microbially induced calcite precipitation: biocalcification (MICP)
+  micp: biocalcification (MICP)
+  biocementation: biocimentation
+  geosynthetics: géosynthétiques
+  geosynthetic: géosynthétique
+  geogrid: géogrille
+  geotextile: géotextile
+  reinforced soil: sol renforcé
+  embankment: remblai
+  embankments: remblais
+  dam: barrage
+  dams: barrages
+  earth dam: barrage en terre
+  tailings: résidus miniers
+  tailings dam: digue à stériles
+  tunnel: tunnel
+  tunnels: tunnels
+  tunnelling: tunnels
+  tunneling: tunnels
+  face stability: stabilité du front de taille
+  shield tunnelling: creusement au tunnelier
+  tbm: tunnelier
+  underground excavation: excavation souterraine
+  mining: exploitation minière
+  coal mine: mine de charbon
+  roof: toit
+  fracture: fracture
+  fractures: fractures
+  joints: discontinuités
+  discontinuity: discontinuité
+  hydraulic fracturing: fracturation hydraulique
+  damage: endommagement
+  acoustic emission: émission acoustique
+  constitutive model: loi de comportement
+  constitutive modelling: modélisation constitutive
+  constitutive modeling: modélisation constitutive
+  critical state: état critique
+  plasticity: plasticité
+  hypoplasticity: hypoplasticité
+  finite element: éléments finis
+  finite element method: méthode des éléments finis
+  discrete element method: méthode des éléments discrets
+  dem: éléments discrets
+  numerical modelling: modélisation numérique
+  numerical modeling: modélisation numérique
+  numerical simulation: simulation numérique
+  centrifuge: centrifugeuse
+  centrifuge modelling: modélisation en centrifugeuse
+  model test: essai sur modèle
+  triaxial test: essai triaxial
+  triaxial: triaxial
+  cone penetration test: essai au pénétromètre statique (CPT)
+  cpt: CPT
+  standard penetration test: essai SPT
+  pressuremeter: pressiomètre
+  in situ testing: essais in situ
+  site investigation: reconnaissance géotechnique
+  particle size: granulométrie
+  particle breakage: rupture des grains
+  granular materials: matériaux granulaires
+  anisotropy: anisotropie
+  small strain: petites déformations
+  stiffness: rigidité
+  frozen soil: sol gelé
+  permafrost: pergélisol
+  freeze-thaw: gel-dégel
+  thermal: thermique
+  energy piles: géostructures énergétiques
+  offshore: offshore
+  monopile: monopieu
+  suction caisson: caisson à succion
+  scour: affouillement
+  marine clay: argile marine
+  railway: voie ferrée
+  pavement: chaussée
+  subgrade: plateforme
+  machine learning: apprentissage automatique
+  neural network: réseau de neurones
+  artificial neural network: réseau de neurones
+  deep learning: apprentissage profond
+  monitoring: auscultation
+  insar: InSAR
+  remote sensing: télédétection
+  contaminated soil: sol pollué
+  landfill: centre de stockage de déchets
+  waste: déchets
+  rainfall: pluie
+  erosion: érosion
+  internal erosion: érosion interne
+  piping: renard hydraulique
+  karst: karst
+  sinkhole: fontis
+  subsidence: subsidence
+  land subsidence: subsidence
+words:
+  and: et
+  of: de
+  analysis: analyse
+  behavior: comportement
+  behaviour: comportement
+  model: modèle
+  modeling: modélisation
+  modelling: modélisation
+  design: dimensionnement
+  testing: essais
+  test: essai
+  strength: résistance
+  deformation: déformation
+  stability: stabilité
+  failure: rupture
+  soil: sol
+  soils: sols
+  rock: roche
+  rocks: roches
+  water: eau
+  loading: chargement
+  load: charge
+  stress: contrainte
+  strain: déformation
+  properties: propriétés
+  mechanical: mécaniques
+  hazard: aléa
+  risk: risque

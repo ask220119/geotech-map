@@ -1,0 +1,52 @@
+# Map of Geotechnics — pipeline configuration
+# Each "city" is a paper from OpenAlex; "countries" are Leiden clusters of papers
+# that cite the same literature (bibliographic coupling) or cite each other.
+
+openalex:
+  # Put your email here (or set OPENALEX_MAILTO) to join OpenAlex's "polite pool".
+  mailto: ""
+  # OpenAlex topics that define "geotechnics". Papers whose PRIMARY topic is one of these are kept.
+  topics:
+    T10233: Geotechnical Engineering and Soil Mechanics
+    T11375: Geotechnical Engineering and Soil Stabilization
+    T12233: Geotechnical Engineering and Underground Structures
+    T12482: Tunneling and Rock Mechanics
+    T10161: Rock Mechanics and Modeling
+    T13596: Grouting, Rheology, and Soil Mechanics
+    T10716: Soil and Unsaturated Flow
+    T13862: Soil, Finite Element Methods
+    T10535: Landslides and related hazards
+    T12293: Dam Engineering and Safety
+    T11046: Geotechnical Engineering and Analysis
+    T13619: Geotechnical and Geomechanical Engineering
+    T13772: Geomechanics and Mining Engineering
+    T13941: Geotechnical and Mining Engineering
+  # Optional neighbours you may want to add later:
+  #   T13925 Offshore Engineering and Technologies, T14146 Earthquake and Tsunami Effects,
+  #   T11952 Landfill Environmental Impact Studies, T13236 Geotechnical and construction materials
+  min_citations: 50        # ~38k papers with these topics (Nov 2026). Lower = bigger map, slower fetch.
+  from_year: 1960
+  max_works: 60000         # hard cap
+
+graph:
+  k_neighbors: 15          # keep top-k most similar papers per paper (like anvaka's sparse Jaccard graph)
+  min_jaccard: 0.02        # drop weaker bibliographic-coupling links
+  min_shared_refs: 2
+  citation_weight: 0.35    # weight of a direct citation A->B inside the corpus
+  related_weight: 0.15     # weight of OpenAlex "related_works" links inside the corpus
+
+cluster:
+  resolution: 1.0          # Leiden RB resolution; higher = more, smaller countries
+  min_size: 12             # smaller clusters are merged into their best-connected neighbour
+  seed: 42
+
+layout:
+  world_lon: 170           # map extent in degrees (kept within +/-60 lat to limit Mercator stretch)
+  world_lat: 60
+  seed: 42
+
+naming:
+  # "keywords" (offline, uses glossary.yaml for French) or "llm" (Anthropic API, needs ANTHROPIC_API_KEY)
+  method: keywords
+  llm_model: claude-sonnet-4-5
+  papers_in_prompt: 25
