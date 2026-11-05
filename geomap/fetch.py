@@ -64,6 +64,8 @@ def run(cfg: dict | None = None):
             r = session.get(API, params=params, timeout=60)
             if r.status_code == 200:
                 break
+            if 400 <= r.status_code < 500 and r.status_code != 429:
+                raise SystemExit(f"OpenAlex rejected the query (HTTP {r.status_code}): {r.text[:500]}")
             wait = 2 ** attempt
             log("fetch", f"HTTP {r.status_code}, retry in {wait}s")
             time.sleep(wait)
