@@ -50,6 +50,17 @@ a:hover { text-decoration: underline; }
 .lang-switch button { border: 0; padding: 8px 12px; background: var(--panel); color: var(--muted); cursor: pointer; font-weight: 600; }
 .lang-switch button.active { background: var(--accent); color: #032; }
 
+/* legend + ISSMGE toggle */
+.legend {
+  position: absolute; left: 8px; bottom: 28px; z-index: 2; background: var(--panel); border-radius: 4px;
+  padding: 8px 10px; font-size: 13px; box-shadow: 0 2px 6px rgba(0,0,0,.4); display: grid; gap: 4px;
+}
+.legend label { display: flex; align-items: center; gap: 6px; cursor: pointer; }
+.legend > div { display: flex; align-items: center; gap: 6px; color: var(--muted); }
+.legend .dot { width: 9px; height: 9px; border-radius: 50%; background: #f4efe4; margin: 0 2px; }
+.ring { display: inline-block; width: 9px; height: 9px; border-radius: 50%; border: 1.5px solid #7fe3d6; margin-right: 4px; vertical-align: middle; }
+.badge { background: rgba(127, 227, 214, .15); color: #7fe3d6; padding: 1px 6px; border-radius: 8px; font-size: 12px; }
+
 /* panels */
 .panel {
   position: absolute; z-index: 2; background: var(--panel); border-color: var(--border);
@@ -100,4 +111,5 @@ ol.papers, ul.papers { padding-left: 20px; }
   }
   .panel.left:not(.about) .close { top: 12px; }
   .panel.about { width: 100%; }
+  .legend { bottom: auto; top: 56px; left: 8px; font-size: 12px; }
 }

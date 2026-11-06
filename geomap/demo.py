@@ -54,6 +54,7 @@ def run(n=4000, seed=7):
             "doi": None, "venue": "Demo Journal of Geotechnics", "authors": [f"Author {i % 97}"],
             "topic": "Geotechnical Engineering and Soil Mechanics", "topic_id": "T10233",
             "keywords": [theme] + k, "refs": sorted(refs), "related": [], "lang": "en", "_theme": t,
+            "abstract": f"We study {theme} with emphasis on {k[0]} and {k[1]}.",
         })
     # in-corpus citations: newer papers cite older ones of the same theme
     by_t = {}
@@ -78,4 +79,16 @@ def run(n=4000, seed=7):
     for r in rows:
         r.pop("_theme")
     write_jsonl(DATA / "works.jsonl", rows)
+    # fake ISSMGE proceedings papers (no citations, placed by the overlay step)
+    conf = []
+    for i in range(n // 3):
+        t = int(rng.integers(len(THEMES)))
+        theme, kws = THEMES[t]
+        k = list(rng.choice(kws, size=2, replace=False))
+        conf.append({"id": f"I{i:011d}", "kind": "issmge",
+                     "url": f"https://www.issmge.org/publications/publication/demo-{i}",
+                     "pdf": None, "doi": None, "title": f"[DEMO ISSMGE] {k[0].capitalize()} in {theme} #{i}",
+                     "authors": [f"Engineer {i % 53}"], "venue": "Demo ICSMGE 2025", "year": 2025,
+                     "abstract": f"Case history on {theme}: {k[0]}, {k[1]}."})
+    write_jsonl(DATA / "issmge.jsonl", conf)
     log("demo", f"wrote {n:,} synthetic papers -> {DATA / 'works.jsonl'}")

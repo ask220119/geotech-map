@@ -33,10 +33,13 @@ Keys (all free): `OPENALEX_API_KEY` (required to download more than 200 papers, 
 | step      | file                 | output (in `data/`)                  |
 |-----------|----------------------|--------------------------------------|
 | `fetch`   | `geomap/fetch.py`    | `works.jsonl` — one paper per line   |
+| `issmge`  | `geomap/issmge.py`   | `issmge.jsonl` — ISSMGE Online Library proceedings (polite, resumable harvest) |
 | `embed`   | `geomap/embed.py`    | `embeddings.npy` — SPECTER2 vectors from Semantic Scholar (optional) |
+| `embed_local` | `geomap/embed_local.py` | SPECTER2 computed locally for papers S2 lacks, e.g. ISSMGE (optional, `requirements-embed.txt`) |
 | `graph`   | `geomap/graph.py`    | `nodes.json`, `edges.npz` (sparse top-k graph) |
 | `cluster` | `geomap/cluster.py`  | `clusters.json` — paper → country    |
 | `layout`  | `geomap/layout.py`   | `layout.json` — paper → [lon, lat]   |
+| `overlay` | `geomap/overlay.py`  | places ISSMGE papers beside their most similar journal papers (SPECTER2, or TF-IDF fallback) |
 | `borders` | `geomap/borders.py`  | `borders.json` — Voronoi cells dissolved per country |
 | `names`   | `geomap/naming.py`   | `names.json` — `en`, `fr`, keywords  |
 | `export`  | `geomap/export.py`   | `web/data/*` — what the site reads   |
@@ -60,6 +63,16 @@ so you can tune one stage (e.g. `cluster.resolution`) and re-run from there.
 - Manual fixes: create `names.overrides.json` at the repo root, e.g.
   `{"12": {"en": "Pressuremeter Plains", "fr": "Plaines du pressiomètre"}}` — it always wins.
 
+## ISSMGE conference papers
+
+About 17,000 open-access papers from the [ISSMGE Online Library](https://www.issmge.org/publications/online-library)
+(ICSMGE since 1936, regional conferences, TC symposia) are added as an **overlay**: the countries are built from
+journal papers only, and each conference paper joins the country of the journal papers it most resembles
+(teal rings on the map, with an on/off switch). No licence is stated on issmge.org, so the site shows
+**metadata and a link only**; abstracts are used to place papers and are never published. The harvest is
+polite (1 request/second, identified User-Agent) and resumable: `issmge.max_minutes` caps each run and the
+workflow caches progress, so the first full harvest spans about two runs.
+
 ## Web map (`web/`)
 
 - Click a paper: authors, venue, citations, DOI/OpenAlex links, its 20 closest papers, and connection lines.
@@ -82,7 +95,7 @@ MapLibre needs SDF glyphs for labels. They are generated locally from DejaVu San
 ## Credits & licences
 
 - Idea, method and UX: Andrei Kashcha, [map-of-github](https://github.com/anvaka/map-of-github) (MIT). No code copied; the naming prompt is adapted from its README.
-- Data: [OpenAlex](https://openalex.org) (CC0).
+- Data: [OpenAlex](https://openalex.org) (CC0), [Semantic Scholar](https://www.semanticscholar.org/product/api), [ISSMGE Online Library](https://www.issmge.org/publications/online-library) (metadata and links only).
 - Rendering: [MapLibre GL JS](https://maplibre.org) 4.7.1 (BSD-3, `web/vendor/`).
 - Fonts: DejaVu (free licence, `web/fonts/DejaVu-LICENSE.txt`).
 - This project: MIT (see `LICENSE`).

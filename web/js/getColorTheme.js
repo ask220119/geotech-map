@@ -11,6 +11,7 @@ const strata = {
   placeLabelsColor: '#ffffff',
   placeLabelsHaloColor: 'rgba(0,0,0,0.75)',
   linkColor: '#ffd59a',
+  conferenceColor: '#7fe3d6',  // ISSMGE proceedings: teal rings
   primaryHighlight: '#bf2072',
   secondaryHighlight: '#e56aaa',
   color: [

@@ -17,8 +17,20 @@ API = "https://api.openalex.org/works"
 FIELDS = ",".join([
     "id", "doi", "display_name", "publication_year", "cited_by_count",
     "referenced_works", "related_works", "primary_topic", "keywords",
-    "authorships", "primary_location", "language",
+    "authorships", "primary_location", "language", "abstract_inverted_index",
 ])
+
+
+def abstract_text(inv: dict | None, limit=1500) -> str:
+    """OpenAlex stores abstracts as {word: [positions]}; rebuild the text (used only for
+    placing papers, never published)."""
+    if not inv:
+        return ""
+    pos = {}
+    for word, idx in inv.items():
+        for i in idx:
+            pos[i] = word
+    return " ".join(pos[i] for i in sorted(pos))[:limit]
 
 
 def compact(w: dict) -> dict:
@@ -39,6 +51,7 @@ def compact(w: dict) -> dict:
         "refs": [short_id(r) for r in (w.get("referenced_works") or [])],
         "related": [short_id(r) for r in (w.get("related_works") or [])],
         "lang": w.get("language"),
+        "abstract": abstract_text(w.get("abstract_inverted_index")),
     }
 
 

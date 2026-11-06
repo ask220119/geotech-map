@@ -64,21 +64,27 @@ async function showPaper(id, country, { fly = false } = {}) {
     .map(l => ({ other: l[0] === id ? l[1] : l[0], w: l[2], ext: l[3] }))
     .sort((a, b) => b.w - a.w).slice(0, 20);
   const place = owner.getPlaces().find(f => f.properties.ownerId === country);
+  const isConf = p.kind === 'issmge';
   const doi = p.doi ? `<a href="${esc(p.doi)}" target="_blank" rel="noopener">${t('open_doi')}</a>` : '';
+  const links = isConf
+    ? `<a href="${esc(p.url)}" target="_blank" rel="noopener">${t('open_issmge')}</a>${p.pdf ? `<a href="${esc(p.pdf)}" target="_blank" rel="noopener">${t('open_pdf')}</a>` : ''}${doi}`
+    : `${doi}<a href="https://openalex.org/${esc(id)}" target="_blank" rel="noopener">${t('open_openalex')}</a>`;
+  const citeLine = isConf ? `<span class="badge">${t('issmge_badge')}</span>` : t('cited', p.cites.toLocaleString(getLang()));
 
   panel.innerHTML = `
     <button class="icon-btn close" data-close aria-label="Close">✕</button>
     <div class="subtitle">${t('country')} · <a href="#" data-country="${country}">${esc(countryName(place?.properties))}</a></div>
     <h2>${esc(p.title)}</h2>
     <div class="byline">${esc(p.authors.join(', '))}${p.authors.length >= 6 ? ' et al.' : ''}<br>
-      ${esc(p.venue || '')}${p.venue ? ' · ' : ''}${p.year ?? ''} · ${t('cited', p.cites.toLocaleString(getLang()))}</div>
+      ${esc(p.venue || '')}${p.venue ? ' · ' : ''}${p.year ?? ''} · ${citeLine}</div>
     <div class="tags">${(p.keywords || []).map(k => `<span>${esc(k)}</span>`).join('')}</div>
-    <div class="actions">${doi}<a href="https://openalex.org/${esc(id)}" target="_blank" rel="noopener">${t('open_openalex')}</a></div>
+    <div class="actions">${links}</div>
     <h3>${t('connections')}</h3>
     <ol class="papers">${neigh.map(n => {
       const title = n.ext ? graph.external[n.other]?.[2] : papers[n.other]?.title;
       const c = n.ext ? graph.external[n.other]?.[3] : country;
-      return `<li><a href="#" data-paper="${esc(n.other)}" data-c="${c}">${esc(title || n.other)}</a>${n.ext ? `<span class="ext">${t('external')}</span>` : ''}</li>`;
+      const ring = papers[n.other]?.kind === 'issmge' ? '<span class="ring" title="ISSMGE"></span>' : '';
+      return `<li>${ring}<a href="#" data-paper="${esc(n.other)}" data-c="${c}">${esc(title || n.other)}</a>${n.ext ? `<span class="ext">${t('external')}</span>` : ''}</li>`;
     }).join('')}</ol>`;
 }
 
@@ -94,7 +100,9 @@ async function showCountry(countryId) {
   const place = owner.getPlaces().find(f => f.properties.ownerId === countryId);
   const papers = await getJSON(`${config.papersEndpoint}/${countryId}.json`);
   if (panel.dataset.country !== String(countryId)) return;
-  const top = Object.entries(papers).sort((a, b) => b[1].cites - a[1].cites).slice(0, 40);
+  const all = Object.entries(papers);
+  const top = all.filter(([, p]) => p.kind !== 'issmge').sort((a, b) => b[1].cites - a[1].cites).slice(0, 40);
+  const confs = all.filter(([, p]) => p.kind === 'issmge').sort((a, b) => (b[1].year || 0) - (a[1].year || 0));
   const other = getLang() === 'fr' ? place?.properties.name_en : place?.properties.name_fr;
   panel.innerHTML = `
     <button class="icon-btn close" data-close aria-label="Close">✕</button>
@@ -104,7 +112,11 @@ async function showCountry(countryId) {
     <h3>${t('in_country')}</h3>
     <ol class="papers">${top.map(([id, p]) => `
       <li><a href="#" data-paper="${esc(id)}" data-c="${countryId}" data-fly="1">${esc(p.title)}</a>
-      <div class="meta">${esc(p.authors[0] || '')} · ${p.year ?? ''} · ${p.cites.toLocaleString(getLang())}</div></li>`).join('')}</ol>`;
+      <div class="meta">${esc(p.authors[0] || '')} · ${p.year ?? ''} · ${p.cites.toLocaleString(getLang())}</div></li>`).join('')}</ol>
+    ${confs.length ? `<h3>${t('conf_in_country', confs.length)}</h3>
+    <ol class="papers conf">${confs.slice(0, 30).map(([id, p]) => `
+      <li><a href="#" data-paper="${esc(id)}" data-c="${countryId}" data-fly="1">${esc(p.title)}</a>
+      <div class="meta">${esc(p.authors[0] || '')} · ${esc(p.venue || '')} · ${p.year ?? ''}</div></li>`).join('')}</ol>` : ''}`;
 }
 
 function renderAbout() {
@@ -190,11 +202,24 @@ async function pick(r) {
   showPaper(r.id, r.country);
 }
 
+// ISSMGE toggle + legend
+let confOn = true;
+try { confOn = localStorage.getItem('geomap-conf') !== 'off'; } catch (e) { /* ignore */ }
+const confBox = $('#conf-toggle');
+confBox.checked = confOn;
+owner.setConferencesVisible(confOn);
+confBox.addEventListener('change', () => {
+  owner.setConferencesVisible(confBox.checked);
+  try { localStorage.setItem('geomap-conf', confBox.checked ? 'on' : 'off'); } catch (e) { /* ignore */ }
+});
+getJSON(config.meta).then(m => { if (!m.issmge_papers) $('#legend').hidden = true; }).catch(() => {});
+
 // language
 function applyLanguage(lang) {
   document.querySelectorAll('.lang-switch button').forEach(b => b.classList.toggle('active', b.dataset.lang === lang));
   document.querySelectorAll('[data-i18n-placeholder]').forEach(el => { el.placeholder = t(el.dataset.i18nPlaceholder); });
   $('#made-by').innerHTML = t('made_by');
+  document.querySelectorAll('[data-i18n]').forEach(el => { el.textContent = t(el.dataset.i18n); });
   if (owner.map.isStyleLoaded()) owner.setLanguage(lang); else owner.map.once('load', () => owner.setLanguage(lang));
   if (!$('#about-panel').hidden) renderAbout();
   if (current && !$('#paper-panel').hidden) showPaper(current.id, current.country);

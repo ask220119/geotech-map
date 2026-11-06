@@ -1,0 +1,4 @@
+# Optional: local SPECTER2 embeddings (embed_local step). Install torch CPU first:
+#   pip install torch --index-url https://download.pytorch.org/whl/cpu
+transformers>=4.40
+adapters>=1.0

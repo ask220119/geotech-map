@@ -65,10 +65,12 @@ export default function createMap({ onPaperClick, onCountryClick, onHover }) {
   }
 
   function nearestPaper(point) {
-    if (!map.getLayer('circle-layer')) return null;
+    const layers = ['circle-layer', 'issmge-layer'].filter(l => map.getLayer(l) &&
+      map.getLayoutProperty(l, 'visibility') !== 'none');
+    if (!layers.length) return null;
     const r = 8;
     const feats = map.queryRenderedFeatures([[point.x - r, point.y - r], [point.x + r, point.y + r]],
-      { layers: ['circle-layer'] });
+      { layers });
     let best = null, bestD = Infinity;
     for (const f of feats) {
       const p = map.project(f.geometry.coordinates);
@@ -76,6 +78,11 @@ export default function createMap({ onPaperClick, onCountryClick, onHover }) {
       if (d < bestD) { bestD = d; best = f; }
     }
     return best;
+  }
+
+  function setConferencesVisible(on) {
+    const apply = () => map.setLayoutProperty('issmge-layer', 'visibility', on ? 'visible' : 'none');
+    map.isStyleLoaded() ? apply() : map.once('load', apply);
   }
 
   function setLanguage(lang) {
@@ -141,7 +148,7 @@ export default function createMap({ onPaperClick, onCountryClick, onHover }) {
     map.flyTo({ center: [lon, lat], zoom: zoom ?? Math.max(map.getZoom(), 8), offset });
   }
 
-  return { map, setLanguage, papersInCountry, highlightCountry, showConnections, clearHighlights,
+  return { map, setLanguage, setConferencesVisible, papersInCountry, highlightCountry, showConnections, clearHighlights,
            flyTo, getPlaces: () => places };
 }
 
@@ -176,6 +183,7 @@ function buildStyle() {
           'line-width': ['case', ['==', ['get', 'first'], 1], 1.2, 0.6],
         } },
       { id: 'circle-layer', type: 'circle', source: 'points-source', ...srcLayer,
+        filter: ['!=', ['get', 'kind'], 'issmge'],
         paint: {
           'circle-color': theme.circleColor,
           'circle-opacity': ['interpolate', ['linear'], ['zoom'], 2, 0.35, 8, 0.9],
@@ -184,11 +192,21 @@ function buildStyle() {
           'circle-radius': ['interpolate', ['linear'], ['zoom'],
             2, ['*', ['get', 'size'], 0.18], 6, ['*', ['get', 'size'], 0.6], 12, ['*', ['get', 'size'], 2.2]],
         } },
+      { id: 'issmge-layer', type: 'circle', source: 'points-source', ...srcLayer,
+        filter: ['==', ['get', 'kind'], 'issmge'],
+        paint: {
+          'circle-color': 'rgba(0,0,0,0)',
+          'circle-stroke-color': theme.conferenceColor,
+          'circle-stroke-width': ['interpolate', ['linear'], ['zoom'], 2, 0.5, 8, 1.4],
+          'circle-stroke-opacity': ['interpolate', ['linear'], ['zoom'], 2, 0.45, 8, 0.95],
+          'circle-radius': ['interpolate', ['linear'], ['zoom'], 2, 0.6, 6, 1.8, 12, 6],
+        } },
       { id: 'selected-nodes-layer', type: 'circle', source: 'selected-nodes',
         paint: { 'circle-color': ['get', 'color'], 'circle-radius': ['get', 'size'],
                  'circle-stroke-color': '#fff', 'circle-stroke-width': 1 } },
       { id: 'label-layer', type: 'symbol', source: 'points-source', ...srcLayer,
         minzoom: config.paperLabelsMinZoom,
+        filter: ['any', ['!=', ['get', 'kind'], 'issmge'], ['>=', ['zoom'], config.paperLabelsMinZoom + 2]],
         layout: {
           'text-font': config.fontRegular,
           'text-field': ['get', 'label'],

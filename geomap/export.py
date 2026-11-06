@@ -61,22 +61,43 @@ def run(cfg: dict | None = None):
             shutil.rmtree(OUT / sub, ignore_errors=True)
     OUT.mkdir(parents=True, exist_ok=True)
 
-    placed = [pid for pid in layout]
-    lc = np.log1p([works[p]["cites"] for p in placed])
-    lo, hi = float(lc.min()), float(lc.max()) or 1.0
+    # ISSMGE conference papers (overlay step): metadata + link only, never the abstract
+    conf = {}
+    if (DATA / "issmge.jsonl").exists():
+        conf = {p["id"]: p for p in read_jsonl(DATA / "issmge.jsonl")}
+    overlay = read_json(DATA / "overlay.json") if (DATA / "overlay.json").exists() else {}
+
+    placed = [pid for pid in layout if pid in works or pid in conf]
+    jlc = np.log1p([works[p]["cites"] for p in placed if p in works])
+    lo, hi = (float(jlc.min()), float(jlc.max())) if len(jlc) else (0.0, 1.0)
 
     # --- points ---
     feats, search, details = [], [], defaultdict(dict)
-    for pid, l in zip(placed, lc):
-        w, (lon, lat), c = works[pid], layout[pid], clusters[pid]
-        size = round(2 + 8 * (l - lo) / ((hi - lo) or 1), 2)
+    n_conf = 0
+    for pid in placed:
+        (lon, lat), c = layout[pid], clusters[pid]
+        if pid in works:
+            w = works[pid]
+            size = round(2 + 8 * (np.log1p(w["cites"]) - lo) / ((hi - lo) or 1), 2)
+            props = {"id": pid, "label": short(w["title"]), "year": w["year"], "cites": w["cites"],
+                     "size": size, "parent": c, "kind": "journal"}
+            details[c][pid] = {k: w[k] for k in ("title", "year", "cites", "doi", "venue", "authors",
+                                                 "keywords", "topic")}
+            rank = w["cites"]
+        else:
+            w = conf[pid]
+            n_conf += 1
+            props = {"id": pid, "label": short(w["title"]), "year": w.get("year"), "cites": 0,
+                     "size": 3, "parent": c, "kind": "issmge"}
+            details[c][pid] = {"title": w["title"], "year": w.get("year"), "cites": None,
+                               "doi": ("https://doi.org/" + w["doi"]) if w.get("doi") else None,
+                               "venue": w.get("venue"), "authors": w.get("authors", []),
+                               "keywords": [], "kind": "issmge", "url": w["url"], "pdf": w.get("pdf")}
+            rank = -1
         feats.append({"type": "Feature", "geometry": {"type": "Point", "coordinates": [lon, lat]},
-                      "properties": {"id": pid, "label": short(w["title"]), "year": w["year"],
-                                     "cites": w["cites"], "size": size, "parent": c}})
-        first = w["authors"][0] if w["authors"] else ""
-        search.append([pid, w["title"], first, w["year"], lon, lat, c, w["cites"]])
-        details[c][pid] = {k: w[k] for k in ("title", "year", "cites", "doi", "venue", "authors",
-                                             "keywords", "topic")}
+                      "properties": props})
+        first = w["authors"][0] if w.get("authors") else ""
+        search.append([pid, w["title"], first, w.get("year"), lon, lat, c, rank])
     write_json(OUT / "points.geojson", {"type": "FeatureCollection", "features": feats})
     search.sort(key=lambda r: -r[7])
     write_json(OUT / "search.json", [r[:7] for r in search])
@@ -118,12 +139,26 @@ def run(cfg: dict | None = None):
             graphs[cb]["links"].append([pa, pb, round(w, 3), ext])
             graphs[ca]["external"][pb] = layout[pb] + [works[pb]["title"][:80], cb]
             graphs[cb]["external"][pa] = layout[pa] + [works[pa]["title"][:80], ca]
+    # conference papers: links to their nearest journal papers
+    for pid, o in overlay.items():
+        if pid not in conf or pid not in clusters:
+            continue
+        ca = clusters[pid]
+        for other, sim in o["nn"]:
+            cb = clusters.get(other)
+            if cb is None:
+                continue
+            ext = int(ca != cb)
+            graphs[ca]["links"].append([pid, other, sim, ext])
+            if ext:
+                graphs[ca]["external"][other] = layout[other] + [works[other]["title"][:80], cb]
     for c, gdata in graphs.items():
         write_json(OUT / "graphs" / f"{c}.json", gdata)
 
     write_json(OUT / "meta.json", {
-        "papers": len(placed), "countries": len(geoms), "links": int(len(e["i"])),
-        "built": dt.date.today().isoformat(), "source": "OpenAlex",
+        "papers": len(placed), "journal_papers": len(placed) - n_conf, "issmge_papers": n_conf,
+        "countries": len(geoms), "links": int(len(e["i"])),
+        "built": dt.date.today().isoformat(), "source": "OpenAlex, Semantic Scholar, ISSMGE Online Library",
         "topics": list(cfg["openalex"]["topics"].values()),
         "min_citations": cfg["openalex"]["min_citations"]}, indent=1)
 
@@ -132,4 +167,4 @@ def run(cfg: dict | None = None):
                         "--no-tile-compression", "--drop-densest-as-needed", "--force",
                         str(OUT / "points.geojson")], check=True)
         log("export", "vector tiles written (set usePointTiles: true in web/js/config.js)")
-    log("export", f"{len(placed):,} papers, {len(geoms)} countries -> {OUT}")
+    log("export", f"{len(placed):,} papers ({n_conf:,} ISSMGE), {len(geoms)} countries -> {OUT}")

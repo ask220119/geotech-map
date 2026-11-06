@@ -28,6 +28,13 @@ openalex:
   from_year: 1960
   max_works: 60000         # hard cap
 
+issmge:
+  # ISSMGE Online Library (conference proceedings): metadata + link only on the map
+  enabled: true
+  delay_s: 1.0             # seconds between requests to issmge.org (be polite)
+  max_minutes: 240         # harvest budget per run; the next run resumes where this one stopped
+  neighbours: 10           # nearest journal papers used to place each conference paper
+
 graph:
   k_neighbors: 15          # keep top-k most similar papers per paper (like anvaka's sparse Jaccard graph)
   min_jaccard: 0.02        # drop weaker bibliographic-coupling links
