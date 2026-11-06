@@ -31,13 +31,18 @@ def short(title: str, n=60):
 
 
 def color_countries(geoms: dict):
-    """Greedy colouring so that neighbouring countries get different fills."""
+    """Neighbouring countries (touching or close across the sea) get different fills,
+    and colours are spread evenly so the map never comes out in one colour."""
     ids = sorted(geoms, key=lambda c: -geoms[c].area)
-    colors = {}
+    span = max(max(g.bounds[2] for g in geoms.values()) - min(g.bounds[0] for g in geoms.values()), 1e-9)
+    near = span * 0.08
+    colors, used = {}, {p: 0 for p in PALETTE}
     for c in ids:
-        g = geoms[c].buffer(geoms[c].length * 0.002)
-        taken = {colors[o] for o in colors if g.intersects(geoms[o])}
-        colors[c] = next((p for p in PALETTE if p not in taken), PALETTE[len(colors) % len(PALETTE)])
+        taken = {colors[o] for o in colors if geoms[c].distance(geoms[o]) < near}
+        free = [p for p in PALETTE if p not in taken] or PALETTE
+        pick = min(free, key=lambda p: used[p])
+        colors[c] = pick
+        used[pick] += 1
     return colors
 
 

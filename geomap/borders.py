@@ -38,12 +38,24 @@ def run(cfg: dict | None = None):
 
     out = {}
     for c, idx in by_c.items():
-        land = unary_union([Point(*pts[k]).buffer(buf, quad_segs=6) for k in idx])
-        land = land.buffer(buf * 0.8).buffer(-buf * 0.8)       # fill small bays
+        cp = pts[idx]
+        # coastline buffer from this country's own point spacing (sparse countries need more)
+        if len(cp) > 2:
+            dc, _ = cKDTree(cp).query(cp, k=2)
+            local = float(np.median(dc[:, 1]))
+        else:
+            local = spacing
+        b = max(buf, local * 3.0)
+        land = unary_union([Point(*p).buffer(b, quad_segs=6) for p in cp])
+        land = land.buffer(b * 1.2).buffer(-b * 1.2)            # close gaps: one solid island
         region = unary_union([cells[k] for k in idx]).intersection(land)
         region = region.buffer(-spacing * 0.08).simplify(spacing * 0.15)   # thin gap = border line
         if region.is_empty:
             continue
+        # drop crumbs: keep pieces holding at least 2% of the country's area
+        if region.geom_type == "MultiPolygon":
+            parts = [g for g in region.geoms if g.area >= 0.02 * region.area]
+            region = unary_union(parts)
         out[str(c)] = mapping(region)
     write_json(DATA / "borders.json", out)
     log("borders", f"{len(out)} country polygons (spacing {spacing:.4f}°)")

@@ -38,7 +38,7 @@ graph:
   embedding_k: 10          # SPECTER2 neighbours considered per paper
 
 cluster:
-  resolution: 1.0          # Leiden RB resolution; higher = more, smaller countries
+  resolution: 2.0          # Leiden RB resolution; higher = more, smaller countries (1.0 gave 19 for 39k papers)
   min_size: 12             # smaller clusters are merged into their best-connected neighbour
   seed: 42
 

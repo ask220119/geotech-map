@@ -43,11 +43,7 @@ def to_french(term: str, terms: dict, words: dict) -> tuple[str, bool]:
                 return terms[key], True
             rest_fr, ok = to_french(rest, terms, words)
             return f"{terms[key]} ({rest_fr})", ok
-    out, ok = [], True
-    for w in t.split():
-        out.append(words.get(w, w))
-        ok &= w in words
-    return " ".join(out), ok
+    return term, False   # keep the English term; flagged for a human check
 
 
 def cap(s: str) -> str:
@@ -55,7 +51,7 @@ def cap(s: str) -> str:
 
 
 def keyword_names(works, clusters, cfg):
-    terms, words = load_glossary()
+    terms, words_fr = load_glossary()
     per_c = defaultdict(Counter)
     topics = defaultdict(Counter)
     df = Counter()
@@ -73,21 +69,35 @@ def keyword_names(works, clusters, cfg):
             df[k] += 1
     K = max(1, len(per_c))
     names, used = {}, set()
+    stop = {"and", "of", "the", "in", "for", "soil", "soils", "rock", "analysis", "&"}
+
+    def words(k):
+        # crude stems: "tunnel"/"tunneling", "dam"/"dams" count as the same word
+        return {w[:5] for w in re.findall(r"[a-z]+", k.lower()) if w not in stop}
+
     for c in sorted(per_c):
         scored = sorted(((v * math.log(1 + K / df[k]), k) for k, v in per_c[c].items()), reverse=True)
-        picks = [k for _, k in scored[:6]]
-        en_parts = picks[:2] if len(picks) >= 2 else picks
-        en = " & ".join(cap(p) for p in en_parts) or f"Country {c}"
-        i = 2
-        while en.lower() in used and i < len(picks):       # keep names distinct, like anvaka
-            en_parts = [picks[0], picks[i]]
-            en = " & ".join(cap(p) for p in en_parts)
-            i += 1
+        picks = [k for _, k in scored[:8]]
+        if not picks:
+            continue
+        # second term must add something: no shared content word with the first
+        first = picks[0]
+        second = next((k for k in picks[1:] if not (words(k) & words(first))), None)
+        parts = [first] + ([second] if second else [])
+        en = " & ".join(cap(p) for p in parts)
+        if en.lower() in used and len(picks) > 2:              # keep names distinct, like anvaka
+            alt = next((k for k in picks[1:] if k != second and not (words(k) & words(first))), None)
+            if alt:
+                parts = [first, alt]
+                en = " & ".join(cap(p) for p in parts)
         used.add(en.lower())
-        fr_parts = [to_french(p, terms, words) for p in en_parts]
+        fr_parts = [to_french(p, terms, words_fr) for p in parts]
+        # a half-translated second term reads worse than none: drop it
+        if len(fr_parts) == 2 and not fr_parts[1][1]:
+            fr_parts = fr_parts[:1]
         fr = " et ".join(cap(p) for p, _ in fr_parts)
         names[str(c)] = {"en": en, "fr": fr, "fr_checked": all(ok for _, ok in fr_parts),
-                         "keywords": picks, "topic": topics[c].most_common(1)[0][0],
+                         "keywords": picks[:6], "topic": topics[c].most_common(1)[0][0],
                          "size": sum(topics[c].values())}
     return names
 

@@ -206,6 +206,61 @@ terms:
   sinkhole: fontis
   subsidence: subsidence
   land subsidence: subsidence
+  # --- added from the first real build (Nov 2026) ---
+  uniaxial compression: compression uniaxiale
+  uniaxial compressive strength: résistance en compression uniaxiale
+  unconfined compressive strength: résistance en compression simple
+  rock strength prediction: prévision de la résistance des roches
+  rock cutting: abattage mécanique des roches
+  granite: granite
+  sandstone: grès
+  rock fracture: fracturation des roches
+  soil hydraulic properties: propriétés hydrauliques des sols
+  soil water retention: rétention d'eau des sols
+  preferential flow: écoulements préférentiels
+  saturated hydraulic conductivity: conductivité hydraulique saturée
+  root water uptake: prélèvement d'eau racinaire
+  landslide susceptibility mapping: cartographie de la susceptibilité aux glissements
+  landslide inventory: inventaire des glissements
+  rainfall-induced landslides: glissements déclenchés par les pluies
+  landslide conditioning factors: facteurs de prédisposition aux glissements
+  rock avalanches: avalanches rocheuses
+  avalanches: avalanches
+  debris avalanches: avalanches de débris
+  pile-soil interaction: interaction sol-pieu
+  offshore wind turbines: éoliennes en mer
+  monopile foundations: fondations sur monopieu
+  tunnel boring machine: tunnelier
+  shield tunneling: creusement au tunnelier
+  tunnel face stability: stabilité du front de taille
+  ground settlement: tassements de surface
+  rockburst prediction: prévision des coups de terrain
+  longwall mining: exploitation par longues tailles
+  microseismic monitoring: surveillance microsismique
+  deep tunnels: tunnels profonds
+  lime stabilization: traitement à la chaux
+  cement stabilization: traitement au ciment
+  compacted bentonite: bentonite compactée
+  degree of saturation: degré de saturation
+  safety factor: coefficient de sécurité
+  factor of safety: coefficient de sécurité
+  failure probability: probabilité de rupture
+  soil spatial variability: variabilité spatiale des sols
+  geosynthetic-reinforced soil: sol renforcé par géosynthétiques
+  geogrid reinforcement: renforcement par géogrilles
+  geocell reinforcement: renforcement par géocellules
+  soil thermal conductivity: conductivité thermique des sols
+  unfrozen water content: teneur en eau non gelée
+  freeze-thaw cycles: cycles de gel-dégel
+  concrete gravity dams: barrages-poids en béton
+  gravity dam: barrage-poids
+  arch dams: barrages-voûtes
+  dam safety monitoring: auscultation des barrages
+  cement grout: coulis de ciment
+  grout rheology: rhéologie des coulis
+  water-cement ratio: rapport eau/ciment
+  superplasticizer: superplastifiant
+  suffusion: suffusion
 words:
   and: et
   of: de
