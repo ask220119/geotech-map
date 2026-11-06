@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       mode:
-        description: "demo (fake data, 1 min) or all (real OpenAlex data, ~20 min)"
+        description: "demo (fake data, 1 min) or all (real data)"
         default: all
         type: choice
         options: [all, demo]
@@ -18,24 +18,52 @@ permissions:
 
 concurrency:
   group: pages
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    timeout-minutes: 90
+    timeout-minutes: 350
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
           cache: pip
-      - run: pip install -r requirements.txt
+      - name: Install
+        run: |
+          pip install -r requirements.txt
+          pip install torch --index-url https://download.pytorch.org/whl/cpu
+          pip install -r requirements-embed.txt
+
+      # ISSMGE harvest and SPECTER2 model are kept between runs, so each run resumes
+      - name: Restore harvest cache
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            data/issmge.jsonl
+            data/issmge_urls.json
+            ~/.cache/huggingface
+          key: harvest-${{ github.run_id }}
+          restore-keys: harvest-
+
       - name: Build the map
         env:
           OPENALEX_MAILTO: ${{ vars.OPENALEX_MAILTO }}
           OPENALEX_API_KEY: ${{ secrets.OPENALEX_API_KEY }}
+          S2_API_KEY: ${{ secrets.S2_API_KEY }}
         run: python run.py ${{ github.event.inputs.mode || 'all' }}
+
+      - name: Save harvest cache
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: |
+            data/issmge.jsonl
+            data/issmge_urls.json
+            ~/.cache/huggingface
+          key: harvest-${{ github.run_id }}
+
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
