@@ -34,6 +34,8 @@ graph:
   min_shared_refs: 2
   citation_weight: 0.35    # weight of a direct citation A->B inside the corpus
   related_weight: 0.15     # weight of OpenAlex "related_works" links inside the corpus
+  embedding_weight: 0.25   # weight of SPECTER2 similarity links (Semantic Scholar); 0 = off
+  embedding_k: 10          # SPECTER2 neighbours considered per paper
 
 cluster:
   resolution: 1.0          # Leiden RB resolution; higher = more, smaller countries

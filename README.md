@@ -6,7 +6,7 @@ A zoomable map of geotechnical research, built the same way as
 | map-of-github                          | Map of Geotechnics                                                      |
 |----------------------------------------|-------------------------------------------------------------------------|
 | a city = a GitHub repo                 | a city = a paper (OpenAlex, ≥ 50 citations, 14 geotechnics topics)      |
-| similarity = Jaccard of stargazers     | similarity = Jaccard of reference lists (bibliographic coupling) + direct citations + OpenAlex related works |
+| similarity = Jaccard of stargazers     | similarity = Jaccard of reference lists (bibliographic coupling) + direct citations + OpenAlex related works + SPECTER2 text similarity (Semantic Scholar) |
 | Leiden clustering → countries          | same (`leidenalg`)                                                      |
 | ngraph.forcelayout, two levels         | igraph Fruchterman-Reingold, two levels (countries, then papers inside) |
 | borders.geojson / places.geojson       | same files, same `symbolzoom` convention                                |
@@ -25,7 +25,7 @@ python -m http.server -d web 8000   # open http://localhost:8000
 python run.py all         # the real map: download from OpenAlex (~38k papers, ~15 min), then build
 ```
 
-Set your email in `config.yaml` (`openalex.mailto`) or `OPENALEX_MAILTO` to use OpenAlex's faster "polite pool".
+Keys (all free): `OPENALEX_API_KEY` (required to download more than 200 papers, openalex.org/settings/api), `OPENALEX_MAILTO` (your email), and optionally `S2_API_KEY` (semanticscholar.org/product/api) for faster embeddings. If Semantic Scholar is unreachable, the map is built from citations alone.
 `web/data/` ships with the demo build (every title starts with `[DEMO]`) so the site opens immediately.
 
 ## Pipeline (`python run.py <step>`)
@@ -33,6 +33,7 @@ Set your email in `config.yaml` (`openalex.mailto`) or `OPENALEX_MAILTO` to use 
 | step      | file                 | output (in `data/`)                  |
 |-----------|----------------------|--------------------------------------|
 | `fetch`   | `geomap/fetch.py`    | `works.jsonl` — one paper per line   |
+| `embed`   | `geomap/embed.py`    | `embeddings.npy` — SPECTER2 vectors from Semantic Scholar (optional) |
 | `graph`   | `geomap/graph.py`    | `nodes.json`, `edges.npz` (sparse top-k graph) |
 | `cluster` | `geomap/cluster.py`  | `clusters.json` — paper → country    |
 | `layout`  | `geomap/layout.py`   | `layout.json` — paper → [lon, lat]   |

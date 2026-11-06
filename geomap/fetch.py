@@ -58,8 +58,8 @@ def run(cfg: dict | None = None):
         params["mailto"] = mailto
     api_key = os.environ.get("OPENALEX_API_KEY")
     if api_key:
-        params["api_key"] = api_key
-        
+        params["api_key"] = api_key  # free key, needed for cursor paging: openalex.org/settings/api
+
     session = requests.Session()
     rows, total = [], None
     while params["cursor"] and len(rows) < oa["max_works"]:

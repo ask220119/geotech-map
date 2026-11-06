@@ -5,7 +5,7 @@ from __future__ import annotations
 
 import numpy as np
 
-from .common import DATA, log, write_jsonl
+from .common import DATA, log, write_json, write_jsonl
 
 THEMES = [
     ("liquefaction", ["soil liquefaction", "cyclic loading", "site response", "shear wave velocity"]),
@@ -64,6 +64,17 @@ def run(n=4000, seed=7):
         if older:
             for o in rng.choice(len(older), size=min(3, len(older)), replace=False):
                 r["refs"].append(older[int(o)]["id"])
+    # fake SPECTER2-like vectors: theme direction + noise, for 90% of papers
+    centres = rng.normal(size=(len(THEMES), 768))
+    emb_ids, emb = [], []
+    for r in rows:
+        if rng.random() < 0.9:
+            emb_ids.append(r["id"])
+            emb.append(centres[r["_theme"]] + rng.normal(scale=1.2, size=768))
+    X = np.array(emb, np.float32)
+    X /= np.linalg.norm(X, axis=1, keepdims=True)
+    np.save(DATA / "embeddings.npy", X.astype(np.float16))
+    write_json(DATA / "embedding_ids.json", emb_ids)
     for r in rows:
         r.pop("_theme")
     write_jsonl(DATA / "works.jsonl", rows)

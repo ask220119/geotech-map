@@ -14,7 +14,7 @@ from collections import defaultdict
 import numpy as np
 import scipy.sparse as sp
 
-from .common import DATA, load_config, log, read_jsonl, write_json
+from .common import DATA, load_config, log, read_json, read_jsonl, write_json
 
 
 def build_paper_ref_matrix(works, max_df_frac=0.05):
@@ -64,6 +64,30 @@ def coupling_topk(P, ref_counts, k, min_jaccard, min_shared, chunk=500):
     return np.concatenate(out_i), np.concatenate(out_j), np.concatenate(out_w).astype(np.float32)
 
 
+def embedding_topk(ids, k, chunk=2000):
+    """Top-k nearest papers by SPECTER2 cosine similarity (only papers that have a vector).
+    Returns (i, j, score) in corpus indices, with score rescaled to 0..1 within this corpus."""
+    emb_path, ids_path = DATA / "embeddings.npy", DATA / "embedding_ids.json"
+    if not emb_path.exists():
+        return None
+    X = np.load(emb_path).astype(np.float32)
+    rows = [ids.get(pid) for pid in read_json(ids_path)]
+    keep = [r is not None for r in rows]
+    X, rows = X[keep], np.array([r for r in rows if r is not None])
+    out_i, out_j, out_s = [], [], []
+    for start in range(0, len(X), chunk):
+        S = X[start:start + chunk] @ X.T
+        for local in range(S.shape[0]):
+            S[local, start + local] = -1          # not yourself
+        top = np.argpartition(-S, k, axis=1)[:, :k]
+        out_i.append(np.repeat(rows[start:start + len(S)], k))
+        out_j.append(rows[top].ravel())
+        out_s.append(np.take_along_axis(S, top, axis=1).ravel())
+    i, j, s = np.concatenate(out_i), np.concatenate(out_j), np.concatenate(out_s)
+    lo, hi = np.percentile(s, 5), np.percentile(s, 99.5)   # corpus-relative scale
+    return i, j, np.clip((s - lo) / (hi - lo + 1e-9), 0, 1)
+
+
 def run(cfg: dict | None = None):
     cfg = cfg or load_config()
     g = cfg["graph"]
@@ -95,6 +119,17 @@ def run(cfg: dict | None = None):
                 key = (a, b) if a < b else (b, a)
                 W[key] += g["related_weight"]; n_rel += 1
 
+    # SPECTER2 neighbours (optional, from the embed step): they place papers that have
+    # no reference list, and soften clusters that are split only by citation habits.
+    n_emb = 0
+    emb = embedding_topk(index, g.get("embedding_k", 10)) if g.get("embedding_weight", 0) > 0 else None
+    if emb is not None:
+        for a, b, sc in zip(*(x.tolist() for x in emb)):
+            if a != b and sc > 0:
+                key = (a, b) if a < b else (b, a)
+                W[key] += g["embedding_weight"] * sc   # adds to any citation evidence
+                n_emb += 1
+
     # Sparsify: keep an edge if it is in the top-k of either endpoint.
     per_node = defaultdict(list)
     for (a, b), w in W.items():
@@ -111,5 +146,6 @@ def run(cfg: dict | None = None):
     np.savez_compressed(DATA / "edges.npz", i=ei, j=ej, w=ew)
     write_json(DATA / "nodes.json", ids)
     connected = len(set(ei.tolist()) | set(ej.tolist()))
-    log("graph", f"{len(keep):,} edges ({n_cite:,} citation links, {n_rel:,} related links); "
+    log("graph", f"{len(keep):,} edges ({n_cite:,} citation links, {n_rel:,} related links, "
+                 f"{n_emb:,} embedding links); "
                  f"{connected:,}/{n:,} papers connected")
