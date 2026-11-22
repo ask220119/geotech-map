@@ -43,6 +43,7 @@ Keys (all free): `OPENALEX_API_KEY` (required to download more than 200 papers, 
 | `borders` | `geomap/borders.py`  | `borders.json` — Voronoi cells dissolved per country |
 | `names`   | `geomap/naming.py`   | `names.json` — `en`, `fr`, keywords  |
 | `export`  | `geomap/export.py`   | `web/data/*` — what the site reads   |
+| `save_state` / `restore_state` | `geomap/state.py` | `harvest-state.tar.gz` — ISSMGE harvest + local vectors kept between runs |
 
 `python run.py build` re-runs everything after `fetch`. Each step reads the previous step's files,
 so you can tune one stage (e.g. `cluster.resolution`) and re-run from there.
@@ -70,8 +71,14 @@ About 17,000 open-access papers from the [ISSMGE Online Library](https://www.iss
 journal papers only, and each conference paper joins the country of the journal papers it most resembles
 (teal rings on the map, with an on/off switch). No licence is stated on issmge.org, so the site shows
 **metadata and a link only**; abstracts are used to place papers and are never published. The harvest is
-polite (1 request/second, identified User-Agent) and resumable: `issmge.max_minutes` caps each run and the
-workflow caches progress, so the first full harvest spans about two runs.
+polite (1 request/second, identified User-Agent) and resumable: `issmge.max_minutes` caps each run, so the
+first full harvest spans two to three runs.
+
+Progress is kept in the **`harvest-state` release** (`data/harvest-state.tar.gz`, written by
+`python run.py save_state` and read back by `restore_state`): the harvested records **without abstracts**, the
+list of paper links, and the SPECTER2 vectors computed locally. A release asset never expires (the Actions cache
+is deleted after 7 days without use), and vectors already computed are reused, so a run only encodes new papers.
+The workflow refuses to save a harvest smaller than the one it started from.
 
 ## Web map (`web/`)
 

@@ -11,7 +11,12 @@ Optional heavy dependencies (CPU is fine, ~20-40 papers/s on a GitHub runner):
     pip install -r requirements-embed.txt
 If they are missing or the model cannot be downloaded, the step is skipped and the overlay
 step places papers by word similarity instead.
-Output: rows appended to data/embeddings.npy / data/embedding_ids.json, data/embedding_check.json
+Vectors computed here are also kept in data/local_vectors.npy / local_vector_ids.json, which
+the workflow saves between runs (see state.py): a paper is only encoded once, so later runs
+only encode newly harvested papers (and papers whose abstract was dropped from the saved
+harvest still keep their full title + abstract vector).
+Output: rows appended to data/embeddings.npy / data/embedding_ids.json, data/embedding_check.json,
+data/local_vectors.npy / data/local_vector_ids.json
 """
 from __future__ import annotations
 
@@ -65,16 +70,63 @@ def run(cfg: dict | None = None):
         return
     log("embed_local", f"{len(todo):,} papers need a local vector "
                        f"({sum(p['id'].startswith('I') for p in todo):,} ISSMGE)")
-    try:
-        t0 = time.time()
-        tok, model = load_model()
-        log("embed_local", f"model loaded in {time.time() - t0:.0f}s")
-    except Exception as e:  # missing packages, no network, ...
-        log("embed_local", f"skipped ({e.__class__.__name__}: {str(e)[:200]}); "
-                           "the overlay will use word similarity")
-        return
 
-    # calibration: local vs Semantic Scholar on papers that have both
+    # vectors computed by earlier runs
+    cache_path, cache_ids_path = DATA / "local_vectors.npy", DATA / "local_vector_ids.json"
+    cache = {}
+    if cache_path.exists() and cache_ids_path.exists():
+        C = np.load(cache_path).astype(np.float32)
+        cache = {pid: C[k] for k, pid in enumerate(read_json(cache_ids_path)) if k < len(C)}
+    reuse = [p for p in todo if p["id"] in cache]
+    fresh = [p for p in todo if p["id"] not in cache]
+    if reuse:
+        log("embed_local", f"{len(reuse):,} vectors reused from earlier runs, {len(fresh):,} to compute")
+
+    X_new = np.zeros((0, 768), np.float32)
+    if fresh:
+        try:
+            t0 = time.time()
+            tok, model = load_model()
+            log("embed_local", f"model loaded in {time.time() - t0:.0f}s")
+        except Exception as e:  # missing packages, no network, ...
+            log("embed_local", f"cannot compute new vectors ({e.__class__.__name__}: {str(e)[:200]})")
+            fresh = []
+        else:
+            calibrate(tok, model, works, have_ids, X_have)
+            t0, vecs = time.time(), []
+            step = 2000
+            for start in range(0, len(fresh), step):
+                vecs.append(encode(tok, model, fresh[start:start + step]))
+                done = min(start + step, len(fresh))
+                log("embed_local", f"{done:,}/{len(fresh):,} ({done / (time.time() - t0):.0f} papers/s)")
+            X_new = np.vstack(vecs)
+    if not reuse and not fresh:
+        log("embed_local", "skipped; the overlay will use word similarity")
+        return
+    if not fresh and not (DATA / "embedding_check.json").exists():
+        log("embed_local", "no calibration on record; the overlay will use word similarity")
+
+    added = reuse + fresh
+    X_add = np.vstack([np.array([cache[p["id"]] for p in reuse], np.float32).reshape(-1, 768), X_new])
+    X = np.vstack([X_have, X_add]).astype(np.float16)
+    np.save(emb_path, X)
+    with open(ids_path, "w", encoding="utf-8") as f:
+        json.dump(have_ids + [p["id"] for p in added], f)
+
+    # keep the cache to the current corpus, so it does not grow with papers that left it
+    corpus = {p["id"] for p in conf + works}
+    for p, v in zip(fresh, X_new):
+        cache[p["id"]] = v
+    keep = [pid for pid in cache if pid in corpus]
+    np.save(cache_path, np.array([cache[pid] for pid in keep], np.float32).reshape(-1, 768).astype(np.float16))
+    with open(cache_ids_path, "w", encoding="utf-8") as f:
+        json.dump(keep, f)
+    log("embed_local", f"saved {len(added):,} local vectors ({len(have_ids) + len(added):,} in total, "
+                       f"{len(fresh):,} newly computed)")
+
+
+def calibrate(tok, model, works, have_ids, X_have):
+    """Local vs Semantic Scholar on papers that have both -> data/embedding_check.json."""
     by_id = {w["id"]: w for w in works}
     sample = [(k, pid) for k, pid in enumerate(have_ids) if pid in by_id and by_id[pid].get("abstract")][:200]
     check = {"n": len(sample)}
@@ -87,16 +139,3 @@ def run(cfg: dict | None = None):
         log("embed_local", f"calibration on {len(sample)} papers: mean cosine local vs S2 = "
                            f"{cos.mean():.3f} (10th pct {np.percentile(cos, 10):.3f})")
     write_json(DATA / "embedding_check.json", check, indent=1)
-
-    t0, vecs = time.time(), []
-    step = 2000
-    for start in range(0, len(todo), step):
-        vecs.append(encode(tok, model, todo[start:start + step]))
-        done = min(start + step, len(todo))
-        log("embed_local", f"{done:,}/{len(todo):,} ({done / (time.time() - t0):.0f} papers/s)")
-    X_new = np.vstack(vecs)
-    X = np.vstack([X_have, X_new]).astype(np.float16)
-    np.save(emb_path, X)
-    with open(ids_path, "w", encoding="utf-8") as f:
-        json.dump(have_ids + [p["id"] for p in todo], f)
-    log("embed_local", f"saved {len(todo):,} local vectors ({len(have_ids) + len(todo):,} in total)")

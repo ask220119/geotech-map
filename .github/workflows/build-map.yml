@@ -12,7 +12,7 @@ on:
     - cron: "17 3 1 * *"   # rebuild with fresh data on the 1st of each month
 
 permissions:
-  contents: read
+  contents: write   # upload the harvest state to the 'harvest-state' release
   pages: write
   id-token: write
 
@@ -36,8 +36,18 @@ jobs:
           pip install torch --index-url https://download.pytorch.org/whl/cpu
           pip install -r requirements-embed.txt
 
-      # ISSMGE harvest and SPECTER2 model are kept between runs, so each run resumes
-      - name: Restore harvest cache
+      # The ISSMGE harvest and the local SPECTER2 vectors live in the 'harvest-state' release
+      # (a release asset never expires; the Actions cache is evicted after 7 days unused).
+      # The Actions cache only keeps the SPECTER2 model download.
+      - name: Restore model cache
+        uses: actions/cache/restore@v4
+        with:
+          path: ~/.cache/huggingface
+          key: model-${{ github.run_id }}
+          restore-keys: model-
+
+      # One-time migration: harvest saved by older runs in the Actions cache, if still there
+      - name: Restore old harvest cache
         uses: actions/cache/restore@v4
         with:
           path: |
@@ -47,6 +57,18 @@ jobs:
           key: harvest-${{ github.run_id }}
           restore-keys: harvest-
 
+      - name: Restore harvest state
+        if: ${{ github.event.inputs.mode != 'demo' }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p data
+          if gh release download harvest-state --pattern harvest-state.tar.gz --dir data --clobber; then
+            python run.py restore_state
+          else
+            echo "No harvest-state release yet: starting from the Actions cache (if any)."
+          fi
+
       - name: Build the map
         env:
           OPENALEX_MAILTO: ${{ vars.OPENALEX_MAILTO }}
@@ -54,15 +76,23 @@ jobs:
           S2_API_KEY: ${{ secrets.S2_API_KEY }}
         run: python run.py ${{ github.event.inputs.mode || 'all' }}
 
-      - name: Save harvest cache
+      - name: Save harvest state
+        if: ${{ always() && github.event.inputs.mode != 'demo' }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python run.py save_state
+          gh release view harvest-state >/dev/null 2>&1 || gh release create harvest-state \
+            --prerelease --title "Harvest state (pipeline data)" \
+            --notes "ISSMGE harvest (metadata and links, no abstracts) and local SPECTER2 vectors, kept between workflow runs. Updated by the build-map workflow; not a software release."
+          gh release upload harvest-state data/harvest-state.tar.gz --clobber
+
+      - name: Save model cache
         if: always()
         uses: actions/cache/save@v4
         with:
-          path: |
-            data/issmge.jsonl
-            data/issmge_urls.json
-            ~/.cache/huggingface
-          key: harvest-${{ github.run_id }}
+          path: ~/.cache/huggingface
+          key: model-${{ github.run_id }}
 
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
